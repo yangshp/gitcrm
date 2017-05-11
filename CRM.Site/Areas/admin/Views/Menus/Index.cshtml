@@ -1,0 +1,317 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+@*<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript"> 
+        $(function () {
+
+            getlist();
+        })
+
+        function getlist()
+        {
+            helper.getfunctions("@Request.RawUrl", CreateGrid)
+
+            }
+        var grid;
+        function CreateGrid( toobaritems)
+        {
+            grid=$("#list").ligerGrid(
+                {
+                    columns:[
+                    {display: "编号", name: "mID", align: 'center', hide: 'true'},
+                    { display: "名称", name: "mName", align: 'left', id: 'menugroup',  width:200 },
+                       { display: "地址", name: "mUrl", align: 'center', width: 200 }
+                , { display: "区域", name: "mArea", align: 'center' }
+                , { display: "控制器", name: "mController", align: 'center' }
+                , { display: "方法", name: "mAction", align: 'center' }
+                , { display: "排序编号", name: "mSortid", align: 'center' }
+                  , {
+                      display: "菜单图标", name: "mPicname", align: 'center'
+                      //使用render:属性通过自定义函数实现当前图标的显示
+                    , render: function (rowdata, index, value) {
+                        return "<i class='" + value + "'></i>";
+                    }
+                  } , {
+                      display: "状态", name: "mStatus", align: 'center'
+                    , render: function (rowdata, index, value) {
+                        if (value == "0") {
+                            return "<font color='green'>正常</font>";
+                        }
+                        return "<font color='red'>停用</font>"
+                    }
+                  }
+                    ],
+                    usePager:false,
+                    url:'/admin/Menus/getlist',
+                    method: 'post',
+                    checkbox:true,
+                    autoCheckChildren: false,//false：选中父节点不再选择子节点 true:表示选中父节点的同时选择子节点
+                    parms:[{name: "kname", value: $("#kname").val}],//传递一个参数到action方法
+                    onSuccess: helper.gridsu,
+                    tree: { 
+                columnName:'menugroup',
+                idFiled:'mID',
+                parentIDField:'mParentID'
+                    },  
+                    toolbar: { items: toobaritems }
+                
+                }
+                );
+        }
+
+        function add() {
+
+            //1.0 获取表格的选择行
+            var row = grid.getSelectedRow();
+
+            if (!row) {
+                helper.warnTip("请选择一行数据");
+                return;
+            }
+            //获取选择的菜单的id
+            var mid = row.mID;
+
+            //2.0 打开新增面板
+            helper.openPanel("新增菜单", "/admin/menus/add/" + mid);
+        }
+        
+        function edit() {
+
+            //1.0 获取表格的选择行
+            var row = grid.getSelectedRow();
+
+            if (!row) {
+                helper.warnTip("请选择一行数据");
+                return;
+            }
+            //获取选择的菜单的id
+            var mid = row.mID;
+
+            //2.0 打开新增面板
+            helper.openPanel("编辑菜单", "/admin/Menus/edit/" + mid);
+
+
+        }
+       
+
+    </script>
+</head>
+    <body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>查询条件</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="get" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <label class="search-label">名称</label>
+                                        <div class="span2 search-input">
+                                            <input id="kname" name="kname" type="text" value="">
+                                        </div>
+                                        <button type="button" class="btn btn-success" onclick="getlist()" style="float: right; margin: 5px 10px 0 0;">
+                                            <span class="icon-search"></span>搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+
+
+</html>*@
+
+
+
+    <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript">
+        $(function () {
+            getlist();
+        })
+
+        //负责获取当前菜单下的当前登录用户的权限按钮
+        function getlist() {
+            helper.getfunctions("@Request.RawUrl", CreateGrid);
+        }
+
+        var grid;
+        function CreateGrid(toolbaritems) {
+            for (var i = 0; i < toolbaritems.length; i++) {
+                if (toolbaritems[i].click) {
+                    //将字符串通过eval()动态执行为方法指针
+                    toolbaritems[i].click = eval(toolbaritems[i].click);
+                }
+            }
+
+            grid = $("#list").ligerGrid({
+                columns: [
+                { display: "编号", name: "mID", align: 'center', hide: 'true' }
+                , { display: "名称", name: "mName", align: 'left', id: 'menugroup', width: 200 }
+                , { display: "地址", name: "mUrl", align: 'center', width: 200 }
+                , { display: "区域", name: "mArea", align: 'center' }
+                , { display: "控制器", name: "mController", align: 'center' }
+                , { display: "方法", name: "mAction", align: 'center' }
+                , { display: "排序编号", name: "mSortid", align: 'center' }
+                , {
+                    display: "菜单图标", name: "mPicname", align: 'center'
+                    //使用render:属性通过自定义函数实现当前图标的显示
+                    ,width:200  ,render: function (rowdata, index, value) {
+                        return "<i class='" + value + "'></i>";
+                    }
+                }
+                , {
+                    display: "状态", name: "mStatus", align: 'center'
+                    , render: function (rowdata, index, value) {
+                        if (value == "0") {
+                            return "<font color='green'>正常</font>";
+                        }
+                        return "<font color='red'>停用</font>"
+                    }
+                }
+                ]
+                , usePager: false  //表示当前表格不需要需要分页
+                , url: '/admin/menus/getlist'  //请求的url，url对应的action方法中应该按照ligerGrid 插件的要求返回json字符串
+                , method: 'post' //防止ajax请求缓存
+                , checkbox: true
+                , autoCheckChildren: false  //false：选中父节点不再选择子节点 true:表示选中父节点的同时选择子节点
+                , parms: [{ name: "kname", value: $("#kname").val() }]  //传递一个参数到action方法
+                , onSuccess: helper.gridsu
+            , tree: {
+                columnId: 'menugroup', // 表示当前树节点放在名字为   menugroup 的列上面
+                idField: 'mID',    //表示id字段
+                parentIDField: 'mParentID'  //表示父idField 对于的字段与parentIDField的比较字段
+            },
+                toolbar: { items: toolbaritems }
+            });
+        }
+
+        //1.0 新增，要将选择的数据id传入新增页面
+        function add() {
+            //1.0 获取表格的选择行
+            var row = grid.getSelectedRow();
+
+            if (!row) {
+                helper.warnTip("请选择一行数据");
+                return;
+            }
+            //获取选择的菜单的id
+            var mid = row.mID;
+
+            //2.0 打开新增面板
+            helper.openPanel("新增菜单", "/admin/menus/add/" + mid);
+        }
+        function edit() {
+            //1.0 获取表格的选择行
+            var row = grid.getSelectedRow();
+
+            if (!row) {
+                helper.warnTip("请选择一行数据");
+                return;
+            }
+            //获取选择的菜单的id
+            var mid = row.mID;
+
+            //2.0 打开新增面板
+            helper.openPanel("编辑菜单", "/admin/menus/edit/" + mid);
+        }
+
+        //根据条件重新加载列表
+        function loadServerData() {
+            grid.loadServerData([{ name: 'kname', value: $("#kname").val() }]);
+        }
+
+    </script>
+</head>
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>查询条件</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="get" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <div class="span2 search-input">
+                                            <div class="input-group" style="width:500px;margin:0 auto;">
+                                                <input type="text" id="kname" name="kname" class="form-control">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button" onclick="loadServerData() ">
+                                                        <span class=" icon-search"></span>搜索
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

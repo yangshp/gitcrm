@@ -1,0 +1,147 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script  type="text/javascript">
+        $(function () {
+
+            getlist();
+        })
+        function getlist()
+        {
+            helper.getfunctions("@Request.RawUrl",CreateGrid)
+
+        }
+        var grid;
+        function CreateGrid(toobaritems)
+        {
+            grid = $("#list").ligerGrid(
+                {
+                    columns: [
+                         { display: "编号", name: "uID", align: "center" }
+                    , { display: "登录用户名", name: "uLoginName", align: "center" }
+                    , { display: "真实名称", name: "uRealName", align: "center" }
+                    , { display: "电话", name: "uTelphone", align: "center" }
+                    , { display: "手机", name: "uMobile", align: "center" }
+                    , { display: "电邮", name: "uEmial", align: "center" }
+                    , { display: "QQ", name: "uQQ", align: "center" }
+                    , {
+                        display: "性别 ", name: "uGender", align: "center"
+                        , render: function (data) {
+                            if (data.uGender == "0") {
+                                return "女";
+                            } else if (data.uGender == "1") {
+                                return "男";
+                            } else {
+                                return "保密";
+                            }
+                        }
+                    }
+               , {
+                   display: "状态 ", name: "uStatus", align: "center"
+                , render: function (data) {
+                    if (data.uStatus == "0") {
+                        return "<font color='green'>正常</font>";
+                    } else {
+                        return "<font color='red'>停用</font>";
+                    }
+                }
+               }
+
+
+                    ]
+                    , usePager: true
+                    , pageSize: 2
+                    , pageSizeOptions: [10, 20, 30, 40, 50, 2]
+                    , url: '/admin/Userinfo/getlist'
+                    , method: "post"
+                    , onSuccess: helper.gridsu
+                    , parms: [{ name: "kname", value: $("#kname").val() }]
+                    , checkbox: true
+                    , toolbar: {
+                        items: toobaritems
+                    }
+
+
+
+                } );
+            
+        }
+
+        // 设置用户角色 
+        function setRole()
+        {
+            //1.0 获取选择数据的对象
+            var row = grid.getSelectedRow();
+
+            // 判断 
+            if (!row)
+            {
+                helper.warnTip("请选择一个用户 ");
+                return;
+            }
+            // 3.0 获取用户的id 和其所在的工作组 
+            var uid = row.uID;
+            var wkid = row.uWorkGroupID;
+            var uidwkid =uid +"-"+wkid;
+            helper.openPanel("设置用户角色", '/admin/Userinfo/setRole/' + uidwkid);
+
+        }
+    </script>
+</head>
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">用户管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>查询条件</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="post" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <label class="search-label">用户名称</label>
+                                        <div class="span2 search-input">
+                                            <input id="kname" name="kname" type="text" value="">
+                                        </div>
+                                        <button type="button" class="btn btn-success" onclick="getlist()" style="float: right; margin: 5px 10px 0 0;">
+                                            <span class="icon-search"></span>搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>用户列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body></html>

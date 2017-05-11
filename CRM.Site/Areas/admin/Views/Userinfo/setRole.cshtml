@@ -1,0 +1,104 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>setRole</title>
+    <script type="text/javascript"  > 
+        $(function () {
+            getRolelist();
+        })
+        // 接收 后台setRolelist 的参数 
+        var wkid = '@ViewBag.wkid';
+        var uid = '@ViewBag.uid'; 
+
+        var grid;
+        function getRolelist()
+        {
+
+            grid = $("#list").ligerGrid({
+
+                url : "/admin/Userinfo/getRolelist/" +  uid+"-"+ wkid ,
+                columns: [
+                    {display:"角色名称" , name : "rName" }
+                ],
+
+                usePager: false,
+                checkbox: true
+                 ,
+                toolbar: {
+                    items: [
+                        { text: "确认", click: 'setUserRole', icon: "ok " },
+                          { text: "关闭", click: function () { window.parent.helper.win.close()}, icon: "delete" },
+
+                    ]
+                },
+                isChecked: function(rowdata) {
+                    // rowdata 对象包括rName , rID , ischecked  = true/false 
+                    return rowdata.ischecked;
+                }
+                });
+
+
+        }
+
+        function setUserRole()
+        {
+            // 1.0 确定当前的设置是给那个用户的
+            var userid = uid;
+            // 2.0  获取用户选择是的虽有行 数据 
+            var rows = grid.getSelectedRows();
+            if (rows == null || rows.length == 0) {
+                helper.warnTip("请至少给用户分配一个角色");
+                return;
+            }
+            //  3.0 获取角色id 
+            var rids = "";
+            for (var i = 0 ; i < rows.length; i++)
+            {
+                rids += rows[i].rID + ",";
+            }
+            //     //4.0 将用户id和rids以post请求的形式提交给服务器
+            var parms = userid + "-" + rids;
+            $.post("/admin/Userinfo/setUserRole/" + parms, null, function (ajaxobj) {
+                helper.checkStatus(ajaxobj, function () {
+                    //提醒用户设置成功
+                    helper.successTip("用户角色分配成功");
+                    //2秒以后关闭设置面板
+                    setTimeout(function () {
+                        window.parent.helper.win.close();
+                    }, 2000);
+                });
+            }, "json");
+        }
+        
+
+    </script>
+    
+</head>
+<body>
+
+          <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>角色权限</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+   
+</body>
+</html>

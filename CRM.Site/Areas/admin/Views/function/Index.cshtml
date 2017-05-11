@@ -1,0 +1,289 @@
+﻿@*@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript"> 
+        $(function () {
+            getMenusTree();
+        });
+        //1.0 获取菜单数
+
+        //function getMenusTree()
+        //{
+        //    $("#menuTree").ligerTree(
+        //        {
+        //            url: "/admin/fuction/getMenusTree"
+        //            , idFieldName: "mID"
+        //            , parentIDFieldName: "mParentID"
+        //            , textFieldName: "mName" //告诉ligerTree节点的名称取mName的值
+        //            , checkbox: false
+        //            , onSelect: treeSel  ////给当前树节点挂载选择事件,当用户选择某个节点的时候会触发treeSel    
+        //        } );
+        //}
+        function getMenusTree() {
+            $("#menuTree").ligerTree({
+                url: "/admin/function/getMenusTree"
+                , idFieldName: "mID"
+                , parentIDFieldName: "mParentID"
+                , textFieldName: "mName" //告诉ligerTree节点的名称取mName的值
+                , checkbox: false
+                , onSelect: treeSel  //给当前树节点挂载选择事件,当用户选择某个节点的时候会触发treeSel
+            });
+        }
+        //2.0 点击树节点被触发 
+        var mid;
+        function treeSel(obj)
+        {
+            //obj 有两个属性   ： data , trget  
+            var node = obj.data;
+            mid = node.mID; //获取节点下的mID属性的值
+
+            // 2.0  显示出来
+            getlist();
+        }
+
+        //3.0 负责获取当前页面的权限按钮
+
+        function getlist()
+        {
+            helper.getfunctions("@Request.RawUrl",CreateGrid);
+        }
+        //var grid;
+        //function CreateGrid(toobaritems)
+        //{
+        //    grid = $("#list").ligerGrid(
+        //        {
+        //            colunms: [{ display: "编号", name: "fID" },
+        //              { display: "操作方法", name: "fName" },
+        //              { display: "标示", name: "fFunction" },
+        //              { display: "图标", name: "fPicname" },
+        //               {
+        //                   display: "状态", name: "fStatus", render: function (rowdata, index, value) {
+        //                       if (value == "0")
+        //                           return "<font color='green'>正常</font>";
+        //                       return "<font color='red'>删除</font>";
+        //                   }
+        //               }
+
+
+        //            ]
+        //            , UsePager: false
+        //            , url: "/admin/fuction/getlist/" + mid
+        //            , onSuccess: helper.gridsu //用户提示异常信息和没有权限或者没有登录
+        //            , toolbar: { items: toobaritems }
+        //        }
+        //        );
+
+        //}
+        var grid;
+        function CreateGrid(toobaritems) {
+            grid = $("#list").ligerGrid({
+                columns: [
+                      { display: "编号", name: "fID" },
+                      { display: "操作方法", name: "fName" },
+                      { display: "标示", name: "fFunction" },
+                      { display: "图标", name: "fPicname" },
+                       {
+                           display: "状态", name: "fStatus", render: function (rowdata, index, value) {
+                               if (value == "0")
+                                   return "<font color='green'>正常</font>";
+                               return "<font color='red'>删除</font>";
+                           }
+                       }
+                ]
+                , usePager: false
+                , url: "/admin/function/getlist/" + mid
+                , onSuccess: helper.gridsu //用户提示异常信息和没有权限或者没有登录
+                , toolbar: { items: toobaritems }
+            });
+        }
+
+
+
+        function add() {
+
+            helper.openPanel("新增按钮" , "/admin/fuction/add/" + mid)
+        }
+
+        function edit()
+        {
+
+        }
+    </script>
+</head>
+    
+
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单按钮列表</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单按钮列表</h5>
+                        </div>
+                        <div style="width: 18%; height: 450px; float: left; border: 1px solid #0094ff;">
+                            <ul id="menuTree"></ul>
+                        </div>
+                        <div style="width: 81%; float: right;">
+                            <div id="list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>*@
+
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript">
+        $(function () {
+            getMenusTree();
+        });
+
+        //1.0 获取菜单数
+        function getMenusTree() {
+            $("#menuTree").ligerTree({
+                url: "/admin/function/getMenusTree"
+                , idFieldName: "mID"
+                , parentIDFieldName: "mParentID"
+                , textFieldName: "mName" //告诉ligerTree节点的名称取mName的值
+                , checkbox: false
+                , onSelect: treeSel  //给当前树节点挂载选择事件,当用户选择某个节点的时候会触发treeSel
+            });
+        }
+        //2.0 点击树节点被触发
+        var mid;
+        function treeSel(obj) {
+            //obj:有两个属性 data,target
+            var node = obj.data; //获取当前节点的对象
+            mid = node.mID;//获取节点下的mID属性的值
+
+            //2.0
+            getlist();
+        }
+
+        //3.0 负责获取当前页面的权限按钮
+        function getlist() {
+            helper.getfunctions("@Request.RawUrl", createGrid);
+        }
+
+        //4.0 负责加载某个菜单下面的按钮数据，以表格的形式显示
+        var grid;
+        function createGrid(toobaritems) {
+            grid= $("#list").ligerGrid({
+                columns: [
+                      { display: "编号", name: "fID" },
+                      { display: "操作方法", name: "fName" },
+                      { display: "标示", name: "fFunction" },
+                      { display: "图标", name: "fPicname" },
+                       {
+                           display: "状态", name: "fStatus", render: function (rowdata, index, value) {
+                               if (value == "0")
+                                   return "<font color='green'>正常</font>";
+                               return "<font color='red'>删除</font>";
+                           }
+                       }
+                ]
+                , usePager: false
+                , url: "/admin/function/getlist/" + mid
+                , onSuccess: helper.gridsu //用户提示异常信息和没有权限或者没有登录
+                , toolbar: { items: toobaritems }
+            });
+        }
+
+
+        function add() {
+            helper.openPanel("新增按钮", "/admin/function/add/" + mid);
+
+        }
+        //function add() {
+
+        //  helper.openPanel("新增按钮", "/admin/fuction/add/" + mid);
+        //}
+
+        function edit() {
+            //1.0 获取选择行
+            var row = grid.getSelectedRow();
+
+            //2.0
+            if (!row) {
+                helper.warnTip("请选择要编辑的行"); return;
+            }
+            //获取当前要编辑的数据主键
+            var fid = row.fID;
+
+            helper.openPanel("编辑按钮", "/admin/function/edit/" + fid);
+        }
+
+        function del() { }
+
+        //根据条件重新加载列表
+        function loadServerData() {
+            grid.loadServerData([{ name: 'kname', value: $("#kname").val() }]);
+        }
+    </script>
+</head>
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单按钮列表</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单按钮列表</h5>
+                        </div>
+                        <div style="width: 18%; height: 450px; float: left; border: 1px solid #0094ff;">
+                            <ul id="menuTree"></ul>
+                        </div>
+                        <div style="width: 81%; float: right;">
+                            <div id="list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+

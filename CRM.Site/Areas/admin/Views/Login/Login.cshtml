@@ -1,0 +1,151 @@
+﻿@model CRM.Model.ModelViews.LoginInfo
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+   
+    <style type="text/css">
+        .list {
+            border-collapse :collapse;
+           width : 400px ;
+           margin :0 auto ;
+
+        }
+            .list th {
+                padding: 5px ; 
+                text-align :right ; 
+                font-size : 16px; 
+               font-weight :bold  ; 
+
+            }
+            .list td {
+                padding:5px;
+            }
+
+
+    </style>
+</head>
+<body>
+    <div id="login">
+        @using (Ajax.BeginForm("Login", "Login", new AjaxOptions()
+        {
+            Url = Url.Action("Login", "Login"),
+            HttpMethod = "Post",
+            OnBegin = "begin",
+            OnSuccess = "success"
+}, new { id = "f1" })
+       )
+        { 
+           <table class ="list">
+               <tr> 
+                   <th> @Html.DisplayNameFor(c =>c.uLoginName ) </th>
+                   <td>  @Html.TextBoxFor(c =>c.uLoginName)
+                   @Html.ValidationMessageFor(c =>c.uLoginName) 
+                       </td>
+               </tr> 
+                <tr> 
+                   <th> @Html.DisplayNameFor(c =>c.uLoginPWD ) </th>
+                   <td>  @Html.TextBoxFor(c =>c.uLoginPWD)
+                   @Html.ValidationMessageFor(c =>c.uLoginPWD) 
+                       </td>
+               </tr> 
+                <tr> 
+                   <th> @Html.DisplayNameFor(c =>c.Vcode ) </th>
+                   <td> 
+                       <img src ="@Url.Action("Vcode","Vcode")" id="imgcode"  onclick="resetVcode()" height="25" width="65"  style="cursor:pointer;" />
+                        @Html.TextBoxFor(c => c.Vcode, new { style ="width:60px;"})
+                   @Html.ValidationMessageFor(c =>c.Vcode) 
+                       </td>
+
+               </tr>
+              <tr>
+                  <th></th>
+                  <td>
+                      @Html.CheckBoxFor(c => c.IsMember ) 是否记住 登录 信息3 天;
+                  </td>
+              </tr>
+
+           </table>
+        }
+        
+        
+    </div>
+
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+ 
+    <script  type="text/javascript">
+        // 将登录div 中的所有元素 利用ligerui显示出来 
+        $(function () {
+            // 将登录div 中的所有元素 利用ligerui显示出来 
+            $.ligerDialog.open({
+                title:"欢迎登录CRM管理系统",
+                target: $("#login"),
+                width: 450,
+                height: 280,
+                allowClose: true,
+                buttons: [
+                    {
+                        text: '确定', onclick: function (item, dialog) {
+                            // 实现from 表单的post提交操作 
+                            $("#f1").submit();
+                        }, cls: 'l-dialog-btn-highlight'
+                    },
+                {  text: '取消', onclick:function(item, dailog)
+                {
+                    // 
+                    document.getElementById("f1").reset();
+
+                }
+        }
+        
+                    
+                ]
+                 
+            });
+        })
+        function resetVcode() {
+            // 此处在IE浏览器中会缓存 
+            var url ='@Url.Action("Vcode","Vcode")'+"?rid="+Math.random();
+            $("#imgcode").attr("src", url); 
+
+
+        }
+
+         
+
+
+    </script>
+
+    <script type="text/javascript">
+        function begin()
+        {
+
+
+        }
+
+        function success(ajaxobj)
+        {
+            // ajaxobj格式
+            if (ajaxobj.status == "1") {
+                //  alert(ajaxobj.msg);
+                $.ligerDialog.warn(ajaxobj.msg);
+            }
+            else {
+                 window.location='@Url.Action("Index","Home")'
+            }
+
+        }
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+﻿@model CRM.Model.ModelViews.sysMenusView
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>edit</title>
+
+    <script type="text/javascript"> 
+        function openWin() {
+
+            helper.openPanel("选择菜单图标", "/iconsel.html", 300, 300);
+        }
+        //此函数被iconsel.html来调用的
+        function setPic(clsName) {
+            $("#mPicname").val(clsName);//给文本框赋值
+            $("#ipic").attr("class", clsName);//给菜单的图标元素i的class属性赋值
+        }
+    </script>
+</head>
+    <body>
+    <div style="margin-top: 15px">
+        @using (Ajax.BeginForm("edit", "Menus", new AjaxOptions()
+        {
+            Url = Url.Action("edit", "Menus")
+            ,
+            HttpMethod = "post",
+            OnBegin = "helper.ajaxbegin"
+            ,
+            OnSuccess = "helper.ajaxsuccess"
+        }))
+        {
+            <table>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mName)</th>
+                    <td>@Html.TextBoxFor(c => c.mName)
+                        @Html.ValidationMessageFor(c => c.mName)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mUrl)</th>
+                    <td>@Html.TextBoxFor(c => c.mUrl)
+                        @Html.ValidationMessageFor(c => c.mUrl)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mArea)</th>
+                    <td>@Html.TextBoxFor(c => c.mArea)
+                        @Html.ValidationMessageFor(c => c.mArea)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mController)</th>
+                    <td>@Html.TextBoxFor(c => c.mController)
+                        @Html.ValidationMessageFor(c => c.mController)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mAction)</th>
+                    <td>@Html.TextBoxFor(c => c.mAction)
+                        @Html.ValidationMessageFor(c => c.mAction)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mLevel)</th>
+                    <td>@Html.TextBoxFor(c => c.mLevel)
+                        @Html.ValidationMessageFor(c => c.mLevel)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mPicname)</th>
+                    <td>@Html.TextBoxFor(c => c.mPicname, new { onfocus = "openWin()" })
+                        <i id="ipic" class="@Model.mPicname"></i>
+                        @Html.ValidationMessageFor(c => c.mPicname)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mSortid)</th>
+                    <td>@Html.TextBoxFor(c => c.mSortid)
+                        @Html.ValidationMessageFor(c => c.mSortid)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.mStatus)</th>
+                    <td>@Html.DropDownListFor(c => c.mStatus, ViewBag.status as SelectList)
+                        @Html.ValidationMessageFor(c => c.mStatus)
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td>
+                        <input type="submit" value="提交" />
+                        <input type="button" value="关闭" onclick="window.parent.helper.win.close()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div id="loading">正在保存，请稍后......</div>
+                    </td>
+                </tr>
+            </table>
+        }
+
+    </div>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+</body>
+
+
+</html>

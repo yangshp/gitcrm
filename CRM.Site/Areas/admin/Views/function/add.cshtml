@@ -1,0 +1,73 @@
+﻿@model CRM.Model.ModelViews.sysFunctionView
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>add</title>
+</head>
+<body>
+  <div style ="margin-top :15px";>
+      @using(Ajax.BeginForm("add","fuction", new AjaxOptions()
+      {
+       Url= Url.Action("add","fuction"),
+       HttpMethod="post",
+       OnBegin ="helper.ajaxbegin",
+       OnSuccess  ="helper.ajaxsuccess"
+       
+      }))
+
+      {
+          <table class="list">
+                   <tr>
+                    <th>@Html.DisplayNameFor(c => c.fName)</th>
+                    <td>@Html.TextBoxFor(c => c.fName)
+                        @Html.ValidationMessageFor(c => c.fName)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.fFunction)</th>
+                    <td>@Html.TextBoxFor(c => c.fFunction)
+                        @Html.ValidationMessageFor(c => c.fFunction)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.fPicname)</th>
+                    <td>@Html.TextBoxFor(c => c.fPicname)
+                        @Html.ValidationMessageFor(c => c.fPicname)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.fStatus)</th>
+                    <td>@Html.DropDownListFor(c => c.fStatus, ViewBag.status as SelectList)
+                    </td>
+                </tr>
+                   <tr>
+                    <th></th>
+                    <td>
+                        <input type="submit" value="提交" />
+                        <input type="button" onclick="window.parent.helper.win.close()" value="关闭" />
+                    </td>
+                </tr>
+                  <tr>
+                    <th></th>
+                    <td>
+                      <div id="loading">正在提交中.......</div>
+                    </td>
+                </tr>
+          </table>
+      
+      
+      }
+
+
+  </div>
+      <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+</body>
+</html>

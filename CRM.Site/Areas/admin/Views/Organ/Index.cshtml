@@ -1,0 +1,148 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript">
+        $(function(){
+            getlist();
+
+        })
+
+        function getlist() {
+
+            helper.getfunctions("@Request.RawUrl",CreateGrid);
+        }
+
+        var grid;
+        function CreateGrid(toobaritems) {
+            grid = $("#list").ligerGrid({
+                //columns: [
+                //    { display: '名称', name: 'osName', id:'osName', align: "left" },
+                //    { display: '编码', name: 'osCode' },
+                //    { display: '类别名', name: 'KName' },
+                //    { display: '别名', name: 'osShortName' },
+                //{
+                //    display: '状态', name: 'osStatus', render: function (rowdata, index, value) {
+
+                //        if (value == "0") {
+                //            return "<font color='green'>正常</font>"
+
+                //        }
+                //        else {
+
+                //            return "<font color='red'> 停用</font>"
+                //        }
+                //    }
+                //},
+                //{ display: '备注', name: 'osRemark', width: 200 }
+
+
+                //]
+                columns:     [   { display: "名称", name: "osName", id: "osName",align :"left" },
+                    { display: "编码", name: "osCode" },
+                    { display: "类别名", name: "KName" },
+                    { display: "别名", name: "osShortName" },
+                    {
+                        display: "状态", name: "osStatus", render: function (rowdata, index, value) {
+                            if (value == "0") {
+                                return "<font color='green'>正常</font>";
+                            }
+                            return "<font color='red'>停用</font>";
+                        }
+                    },
+                    { display: "备注", name: "osRemark", width: 200 }],//2.0 请求的url 
+                url: "/admin/Organ/getlist",
+                // 3.0 请求方式默认为"Post" 
+                method: "post",
+                // 4.0 设置当前表格不分页 
+                usePager: false,
+                //5.0在请求报文体中的格式:kname=123
+                parms: [{ name: 'kname', value: $("#kname").val() }],
+                onSuccess: helper.gridsu,
+                //tree:{
+                //    columnName: 'osName',//表示加号减号图标显示在哪一列
+
+
+                //    idField: 'osID',//表示当前数据的主键
+
+                //    parentIDFieldName: 'osParentID' //表示当前数据是属于哪条数据的子级
+                //}
+
+                tree: {
+                    columnName: 'osName', //表示加号减号图标显示在哪一列
+                    idField: 'osID',  //表示当前数据的主键
+                    parentIDField: 'osParentID' //表示当前数据是属于哪条数据的子级
+                }
+                , toolbar: { items: toobaritems }
+                  
+
+            });
+        }
+
+        function add()
+        {
+
+
+
+        }
+        function edit() { }
+        function del() { }
+    </script>
+</head>
+  <body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">组织结构管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>查询条件</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="post" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <label class="search-label">字典名称</label>
+                                        <div class="span2 search-input">
+                                            <input id="kname" name="kname" type="text" value="">
+                                        </div>
+                                        <button type="button" class="btn btn-success" onclick="getlist()" style="float: right; margin: 5px 10px 0 0;">
+                                            <span class="icon-search"></span>搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>组织结构列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

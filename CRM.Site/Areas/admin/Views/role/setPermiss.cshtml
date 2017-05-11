@@ -1,0 +1,102 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>setPermiss</title>
+   <script type="text/javascript"> 
+       $(function () { getmfTree(); })
+
+       //获取当前设置角色的rid
+
+       var rid = '@ViewBag.rid';
+       var tree
+       function getmfTree()
+       {
+          tree=  $("#mftree").ligerTree({
+               url: "/admin/role/getmfTree/" + rid,
+               textFieldName: "Name",
+               idFieldName: "id",
+               parentIDFieldName: "pid",
+               checkbox: true,
+               autoCheckboxEven: false //关闭复选框的联动效果
+
+
+           });
+
+
+
+       }
+
+       function savedata()
+       {
+       // 1.0 便利树上的所有选择的勾选节点 
+           var nodes = tree.getChecked();
+
+           if (nodes == null || nodes.length == 0)
+           {
+               helper.warnTip("角色至少要有一个权限");
+               return;
+
+           }
+           // 3.0 按照指定的格式拼接成字符串， 角色id-菜单id|菜单id 
+
+           var parms =rid+"-";
+           for (var i = 0 ; i < nodes.length; i++)
+           {
+               // 判断当前节点的类型
+               var node  =nodes[i].data ;
+
+               if (node.ismenu) //表示一个菜单的节点
+               {
+                   parms += node.id + ",0|";
+
+
+               }
+               else//表示一个按钮的节点
+               {
+                   parms += node.pid + "," + node.id + "|";
+
+               }
+
+           }
+           //4.0 将pamrs发送给服务器处理
+           $.post("/admin/role/setPermiss", "p=" + parms, function (ajaxobj) {
+               helper.checkStatus(ajaxobj, function () {
+                   helper.successTip(ajaxobj.msg);
+                   setTimeout(function () {
+                       window.parent.helper.win.close();
+                   }, 2000);
+               });
+           }, "json");
+
+           
+        }
+          
+
+   </script>
+</head>
+<body>
+    <div id="content" style="margin-top: 15px;">
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div>
+                        <input type="button" value="保存" onclick="savedata()" />
+                        <input type="button" value="关闭" onclick="window.parent.helper.win.close()" />
+                    </div>
+                    <div class="widget-box">
+                        <ul id="mftree"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

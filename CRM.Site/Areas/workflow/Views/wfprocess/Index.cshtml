@@ -1,0 +1,94 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript"> 
+        $(function () { getlist(); })
+
+
+        function getlist() { "@Request.RawUrl", CreateGrid };
+
+        var grid;
+        function CreateGrid(toolbaritems) {
+            grid = $("#list").ligerGrid({
+                columns: [
+                    { display: "主键", name: "wfPID" },
+                    { display: "提交人", name: "RealName" },
+                    { display: "标题", name: "wfRFTitle" },
+                    { display: "请假的理由", name: "wfRFRemark" },
+                    { display: "天数/金额", name: "wfRFNum" },
+                    {
+                        display: "状态", name: "wfRFStatus", render: function (rowdata, index, value) {
+                            var color = "#000";
+                            if (value == "41") //驳回
+                            {
+                                color = "#ff6a00";
+                            } else if (value == "42")//拒绝
+                            {
+                                color = "red";
+                            } else if (value == "43")//通过
+                            {
+                                color = "green";
+                            }
+                            return "<font color='" + color + "'>" + rowdata.StatusName + "</font>";
+                        }
+                    },
+                ],
+                url: "/workflow/wfprocess/getlist",
+                usePager: true,
+                toolbar: { items: toolbaritems },
+
+
+
+            });
+        }
+        //审核
+        function checkform() {
+            var row = grid.getSelectedRow();
+
+            var wfPID = row.wfPID;
+
+            helper.openPanel("审核操作", "/workflow/wfprocess/checkform/" + wfPID, 600, 600);
+        }
+
+        
+    
+    </script>
+</head>
+
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>工作流管理</a>
+                <a class="current" href="javascript:void(0)">我的审核单</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>我的审核单</h5>
+                        </div>
+                        <div id="list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

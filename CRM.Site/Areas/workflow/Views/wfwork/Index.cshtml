@@ -1,0 +1,77 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script  type="text/javascript">
+        $(function () { getlist(); });
+
+        function getlist()
+        {
+            helper.getfunctions("@Request.RawUrl", CreateGrid);
+        }
+        var grid;
+        function CreateGrid(toolbarItems)
+        {
+            grid = $("#list").ligerGrid(
+                {
+                    columns: [
+                        { display: "编号", name: "wfID", },
+                           { display: "标题", name: "wfTitle" },
+                    {
+                        display: "状态", name: "wfStatus", render: function (data, index, value) {
+                            if (value == "1")
+                                return "停用";
+                            return "正常";
+                        }
+                    },
+                    { display: "备注", name: "wfRemark", width: 200 },
+                    ],
+                    url: "/workflow/wfwork/getlist",
+                    usePager: false
+                , toolbar: { items: toolbarItems }
+                }
+                );
+
+
+        }
+
+        function add() { }
+        function edit() { }
+        function del() { }
+
+    </script>
+</head>
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单按钮列表</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单按钮列表</h5>
+                        </div>
+                        <div id="list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

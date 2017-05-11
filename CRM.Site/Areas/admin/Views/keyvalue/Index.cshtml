@@ -1,0 +1,347 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript"> 
+        $(function () {
+            //调用方法
+            getlist();
+
+
+        })
+        //利用ligerGrid 插件 进行后台数据的获取  返回JSON  { Rows :[], Total :10  }
+        var grid;
+        function getlist(){
+
+            //1.0  获取当前用户再次菜单页面的权限按钮 以ligerGrid 的toobar的要求的格式传过来
+            @*  $.post("/admin/PermissOpt/GetFunctions", "murl=@Request.RawUrl", function (toobarItems) {
+                // toobaritems格式
+                //items: [
+                //{ text: '增加', click: add, icon: 'add' },
+                //{ line: true },
+                //{ text: '修改', click: edit, icon: 'modify' },
+                //{ line: true },
+                //{ text: '删除', click: del, icon: 'delete' },
+                //{ line: true },
+                //{ text: '刷新', click: getlist, icon: 'refresh' }
+                //]
+                CreateGrid(toobarItems);
+
+            }, "json");*@
+helper.getfunctions("@Request.RawUrl", CreateGrid);
+
+        }
+        // 获取表格数据 ，同时接受一个权限按钮数据 
+        function CreateGrid(toobaritem)
+        {
+grid= $("#list").ligerGrid({
+                //1.0 定义表头 
+                columns: [
+                     { display: '编号', name: 'KID' },
+                     { display: '字典类别', name: 'KType' },
+                     { display: '字典名称', name: 'KName' },
+                     { display: '字典值', name: 'Kvalue' }
+ ],//2.0 请求的url 
+                url: "/admin/keyvalue/getlist",
+                // 3.0 请求方式默认为"Post" 
+                method: "post",
+                // 4.0 设置当前表格不分页 
+                usePager: false,
+                //5.0   将查询条件传入后台getlist 方法 
+                parms:[{ name: 'kname', value: $("#kname").val() }],
+                //6.0 显示表格
+                checkbox:true,
+                //7.0  根据类型分类 
+                 groupColumnName: 'KType', groupColumnDisplay: '分类',
+                onSuccess: helper.gridsu,
+                toolbar: //8.0 在表格上增加工具条,注意：一定要给每个按钮中的click定义一个方法，否则会报错
+            {
+                items: toobaritem,
+                //items: [
+                //{ text: '增加', click: add, icon: 'add' },
+                //{ line: true },
+                //{ text: '修改', click: edit, icon: 'modify' },
+                //{ line: true },
+                //{ text: '删除', click: del, icon: 'delete' },
+                //{ line: true },
+                //{ text: '刷新', click: getlist, icon: 'refresh' }
+                //]
+            }
+            });
+        }
+
+        function add() {
+            helper.openPanel("新增数据字典", "/admin/keyvalue/add");
+        }
+       
+        //编辑
+        function edit() {
+            //1.0 获取选择的行对象 
+            var row = grid.getSelectedRow();
+            //2.0 判断row是否有值
+            if (!row)
+            {
+                helper.warnTip("请选择要编辑的数据行");
+                return;
+            }
+            //3.0 获取row对象中的KID
+            var kid = row.KID;
+            //4.0 打开编辑页面
+            helper.openPanel("编辑数据字典", "/admin/keyvalue/edit/" + kid);
+
+        }
+        //3.0  删除 
+        function del() {
+            // 利用 jquery 发出post 请求给action 方法 即可实现批量删除 
+            // 1.0  获取用户勾选的所有数组
+            var rows = grid.getSelectedRows();
+            //2.0 判断rows是否有值 
+            if (rows == null || rows.length == 0)
+            {
+                helper.warnTip("请至少选择一条要删除的数据行");
+                return;
+            }
+            var kids = "";
+            for (var i = 0; i < rows.length; i++) {
+                kids += rows[i].KID + ",";
+            }
+            $.post("/admin/keyvalue/del/" + kids, null, function (ajaxobj) {
+                helper.checkStatus(ajaxobj, function () {
+                    //1.0 刷新当前页中的列表
+                    grid.reload();
+                });
+            }, "json");
+
+        }
+    </script>
+    
+</head>
+
+    <body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">数据字典管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>查询条件</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="post" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <label class="search-label">字典名称</label>
+                                        <div class="span2 search-input">
+                                            <input id="kname" name="kname" type="text" value="">
+                                        </div>
+                                        <button type="button" class="btn btn-success" onclick="getlist()" style="float: right; margin: 5px 10px 0 0;">
+                                            <span class="icon-search"></span>搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>字典列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+
+
+@*@{
+    Layout = null;
+}
+
+<!DOCTYPE html>*@
+
+@*<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript">
+        $(function () {
+            getlist();
+        })
+        //利用ligerGrid插件进行后台数据的获取工作，返回的格式为Json:   {"Rows":[{KID:1,KType:1,KName:"",Kvalue:""}],"Total":10}
+        var grid;
+        function getlist() {
+            //1.0 获取当前用户在此菜单页面中的权限按钮,以ligerGrid 的Toolbar要求的格式返回
+            helper.getfunctions("@Request.RawUrl", CreateGrid);
+        }
+
+        //0.0 获取表格数据，同时接收一个权限按钮数据
+        function CreateGrid(toobaritem) {
+            grid = $("#list").ligerGrid({
+                //1.0 定义表头
+                columns: [
+                    { display: '编号', name: 'KID' },
+                    { display: '字典类别', name: 'KType' },
+                    { display: '字典名称', name: 'KName' },
+                    { display: '字典值', name: 'Kvalue' }
+                ],
+                //2.0 请求的url
+                url: "/admin/keyvalue/getlist",
+                //3.0 请求默认就是post
+                method: "post",
+                //4.0 设置当前表格不分页
+                usePager: false,
+                //5.0 将查询条件传入后台getlist方法
+                parms: [{ name: 'kname', value: $("#kname").val() }], //在请求报文体中的格式:kname=123
+                groupColumnName: 'KType', groupColumnDisplay: '分类',
+                checkbox: true,
+                onSuccess: helper.gridsu,
+                toolbar: //6.0 在表格上增加工具条,注意：一定要给每个按钮中的click定义一个方法，否则会报错
+                    {
+                        items: toobaritem
+                        //items: [
+                        //{ text: '增加', click: add, icon: 'add' },
+                        //{ line: true },
+                        //{ text: '修改', click: edit, icon: 'modify' },
+                        //{ line: true },
+                        //{ text: '删除', click: del, icon: 'delete' },
+                        //{ line: true },
+                        //{ text: '刷新', click: getlist, icon: 'refresh' }
+                        //]
+                    }
+            });
+        }
+
+        //1.0 新增
+        function add() {
+            helper.openPanel("新增数据字典", "/admin/keyvalue/add")
+        }
+
+        //2.0 编辑
+        function edit() {
+            //1.0 获取选择行的对象
+            var row = grid.getSelectedRow();
+
+            //2.0 判断row是否有值
+            if (!row) {
+                helper.warnTip("请选择要编辑的数据行");
+                return;
+            }
+
+            //3.0 获取row对象中的KID
+            var kid = row.KID;
+
+            //4.0 打开编辑页面
+            // win = $.ligerDialog.open({ title: "编辑数据字典", height: 450, width: 450, url: "/admin/keyvalue/edit/" + kid });
+            helper.openPanel("编辑数据字典", "/admin/keyvalue/edit/" + kid);
+        }
+
+        //3.0 删除
+        function del() {
+            //利用jquery发出post请求给action方法即可实现批量删除
+            //1.0 获取用户勾选的所有行数组
+            var rows = grid.getSelectedRows();
+
+            //2.0 判断rows是否有值
+            if (rows == null || rows.length == 0) {
+                helper.warnTip("请至少选择一条要删除的数据行");
+                return;
+            }
+
+            var kids = "";
+            for (var i = 0; i < rows.length; i++) {
+                kids += rows[i].KID + ",";
+            }
+
+            //3.0
+            $.post("/admin/keyvalue/del/" + kids, null, function (ajaxobj) {
+                helper.checkStatus(ajaxobj, function () {
+                    //1.0 刷新当前页中的列表
+                    grid.reload();
+                });
+            }, "json");
+        }
+
+        //根据条件重新加载列表
+        function loadServerData() {
+            grid.loadServerData([{ name: 'kname', value: $("#kname").val() }]);
+        }
+    </script>
+</head>
+<body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb" style="margin-top:8px;">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">数据字典管理</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--查询条件 -->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-search"></i></span>
+                            <h5>字典名称</h5>
+                        </div>
+                        <div class="widget-content nopadding">
+                            <form class="form-horizontal search-form" method="post" name="basic_validate" novalidate="novalidate">
+                                <div class="control-group">
+                                    <div class="search-group">
+                                        <div class="span2 search-input">
+                                            <div class="input-group" style="width:500px;margin:0 auto;">
+                                                <input type="text" id="kname" name="kname" class="form-control">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button" onclick="getlist()">
+                                                        <span class=" icon-search"></span>搜索
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>字典列表</h5>
+                        </div>
+                        <div id="list" class="widget-content nopadding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>*@

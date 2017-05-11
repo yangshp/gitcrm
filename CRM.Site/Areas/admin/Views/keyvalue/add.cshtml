@@ -1,0 +1,66 @@
+﻿@model CRM.Model.ModelViews.sysKeyValueView
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>add</title>
+</head>
+<body>
+     <div style="margin-top: 15px">
+        @using (Ajax.BeginForm("add", "keyvalue", new AjaxOptions()
+        {
+            Url = Url.Action("add", "keyvalue"),
+            HttpMethod = "post",
+            OnSuccess = "helper.ajaxsuccess",
+            OnBegin = "helper.ajaxbegin"
+        }))
+        {
+            <table class="list">
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.KName)</th>
+                    <td>@Html.TextBoxFor(c => c.KName)
+                        @Html.ValidationMessageFor(c => c.KName)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.KType)</th>
+                    <td>@Html.TextBoxFor(c => c.KType)
+                        @Html.ValidationMessageFor(c => c.KType)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.Kvalue)</th>
+                    <td>@Html.TextBoxFor(c => c.Kvalue)
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.DisplayNameFor(c => c.KRemark)</th>
+                    <td>@Html.TextAreaFor(c => c.KRemark)
+                    </td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td>
+                        <input type="submit" value="提交" />
+                        <input type="button" value="关闭" onclick="window.parent.helper.win.close()" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div id="loading">正在提交中.......</div>
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+<script type="text/javascript">
+         $(function () {
+             getOrganTree();
+
+         })
+         function getOrganTree()
+         {
+             $("#organTree").ligerTree(
+                 {
+                     url: "/admin/role/getOrganTree",
+                     textFieldName: "osName",
+                     idFieldName: "osID",
+                     parentIDFieldName: "osParentID",
+                     checkbox: false,
+                     onSelect: treeSel
+                 });
+
+
+         }
+         var osid;
+         function treeSel(obj) {
+             //1.0  获取当前选择节点的组织结构主键 
+           
+       
+             osid = obj.data.osID;
+             //2.0 获取当前节点下面的角色列表 
+             getlist();
+
+         }
+         // 加载权限按钮
+         function getlist()
+         {
+             helper.getfunctions("@Request.RawUrl", CreateGrid);
+         }
+         // 负责加载角色列表
+         var grid; 
+         function CreateGrid(toolbaritems)
+         {
+           
+             grid =$("#list").ligerGrid({
+                 columns: [
+                     //角色名称  排序号 
+                     { display: "角色名称", name: "rName" },
+                     { display: "排序号", name: "rName" },
+                     { display: "备注", name: "rName" },
+                     {
+                         display: "状态", name: "rName", render: function (rowdata, index, value)
+                         {
+                             if (value == "0")
+                            return "<font color='green'>正常</font>";
+                             return "<font color='red'>停用</font>";
+
+                         }
+                     },
+
+                 ],
+                 url: "/admin/role/getList/" + osid  
+               ,  usePager: false,
+                 checkbox: false,
+                 toolbar: {items: toolbaritems }
+
+             });
+
+         }
+         function add() { }
+         function edit() { }
+         function del() { }
+    // 设置当前 角色的权限 数据 
+         function setPermiss()
+         {
+             //1.0  
+             //    var row = grid.getSelectedRow();
+                   var row = grid.getSelectedRow();
+             //2.0 获取选择行的 角色主键 
+
+             var rid = row.rID;
+             helper.openPanel("分配菜单权限" , "/admin/role/setPermiss/" + rid);
+         }
+     
+     </script>     
+ @*    <script type="text/javascript">
+         $(function () { getOrganTree(); })
+
+         //1.0负责创建组织结构树
+         function getOrganTree() {
+             $("#organTree").ligerTree({
+                 url: "/admin/role/getOrganTree",
+                 textFieldName: "osName",
+                 idFieldName: "osID",
+                 parentIDFieldName: "osParentID",
+                 checkbox: false
+                 , onSelect: treeSel
+             });
+         }
+         var osid;
+         function treeSel(obj) {
+             //1.0 获取当前选择节点的组织结构主键
+             osid = obj.data.osID;
+
+             //2.0 获取当前选择节点下面的角色列表
+             getlist();
+         }
+         //加载权限按钮
+         function getlist() {
+             helper.getfunctions("@Request.RawUrl", CreateGrid);
+        }
+
+        //负责加载角色列表
+        var grid;
+        function CreateGrid(toolbaritems) {
+            grid = $("#list").ligerGrid({
+                columns: [
+                    //角色名称  排序号    
+                    { display: "角色名称", name: "rName" },
+                    { display: "排序号", name: "rSort" },
+                    { display: "备注", name: "rRemark" },
+                    {
+                        display: "状态", name: "rStatus", render: function (rowdata, index, value) {
+                            if (value == "0")
+                                return "<font color='green'>正常</font>";
+                            return "<font color='red'>停用</font>";
+                        }
+                    }
+                ],
+                url: "/admin/role/getlist/" + osid
+                , usePager: false,
+                checkbox: false,
+                toolbar: { items: toolbaritems }
+            });
+        }
+
+        function add() { }
+        function edit() { }
+        function del() { }
+
+        //设置当前角色的权限数据
+        function setPermiss() {
+            //1.0 
+            var row = grid.getSelectedRow();
+
+            //2.0 获取选择行的角色主键
+            var rid = row.rID;
+
+            helper.openPanel("分配菜单权限", "/admin/role/setPermiss/" + rid);
+        }
+    </script>*@
+
+</head>
+    <body>
+    <div id="content">
+        <div id="content-header">
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>系统管理</a>
+                <a class="current" href="javascript:void(0)">菜单按钮列表</a>
+            </div>
+        </div>
+        <div style="height: 100%;">
+            <div id="content-body" class="row-fluid">
+                <div class="span22">
+                    <!--列表-->
+                    <div class="widget-box">
+                        <div class="widget-title">
+                            <span class="icon"><i class="icon-th"></i></span>
+                            <h5>菜单按钮列表</h5>
+                        </div>
+                        <div style="width: 20%; height: 450px; float: left; border: 1px solid #0094ff;">
+                            <ul id="organTree" ></ul>
+                        </div>
+                        <div style="width: 79%; float: right;">
+                            <div id="list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

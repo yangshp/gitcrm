@@ -1,0 +1,110 @@
+﻿@{ 
+    Layout = null; 
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript">
+        $(function () {
+            getlsit();
+            
+        })
+
+        function getlsit() {
+            helper.getfunctions("@Request.RawUrl", CreateGrid);
+
+        }
+
+        var grid;
+        function CreateGrid(toolbaritems) {
+            grid = $("#list").ligerGrid({
+                columns: [   { display: "编号", name: "wfRFID" },
+                { display: "所属工作流", name: "wfTitle" },
+                { display: "标题", name: "wfRFTitle" },
+                { display: "请假/金额", name: "wfRFNum" },
+                {
+                    display: "状态", name: "wfRFStatus", render: function (rowdata, index, value) {
+                        var color = "#000";
+                        if (value == "41") //驳回
+                        {
+                            color = "#ff6a00";
+                        } else if (value == "42")//拒绝
+                        {
+                            color = "red";
+                        } else if (value == "43")//通过
+                        {
+                            color = "green";
+                        }
+                        return "<font color='" + color + "'>" + rowdata.StatusName + "</font>";
+                    }
+                },
+                ]
+                , url: "/workflow/requestform/getlist"
+                , usePager: true
+                , pageSize: 5  //每页显示5条
+                , pageSizeOptions: [5, 10, 20, 30, 40, 50] //页容量数组
+                , toolbar: { items: toolbaritems }
+                , onSuccess: helper.gridsu //出错提醒回调函数
+            });
+
+
+        }
+        
+        //新增申请单
+        function add() {
+            helper.openPanel("新增申请单", "/workflow/requestform/add");
+        }
+        function edit() { }
+        function del() { }
+
+        //查看审核明细
+        function getDetils() {
+            var row = grid.getSelectedRow();
+
+            //获取当前申请单的id
+            var wfRFid = row.wfRFID;
+
+            //获取当前申请单的处理明细列表
+            helper.openPanel("处理明细", "/workflow/requestform/getDetils/" + wfRFid, 600, 600);
+        }
+
+    </script>
+
+</head>
+<body>
+    <div  id="content">
+        <div id="content-header" >
+            <div id="breadcrumb">
+                <a href="javascript:void(0)" title="首页"><i class="icon-home"></i>首页</a>
+                <a href="javascript:void(0)" title="系统管理"><i class="icon-road"></i>工作流管理</a>
+                <a class="current" href="javascript:void(0)">我的申请单</a>
+            </div>
+        </div>
+<div style="height :100%">
+    <div id="content-body" class="row-fluid">
+
+        <div class="span22">
+            <!--列表-->
+            <div class="widget-box">
+                <div class="widget-title">
+                    <span class="icon"><i class="icon-th"></i></span>
+                    <h5>我的申请单</h5>
+                </div>
+                <div id="list">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    </div>
+
+
+</body>
+ 
+</html>

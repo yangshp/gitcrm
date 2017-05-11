@@ -1,0 +1,126 @@
+﻿@model List< CRM.Model.wfProcess> 
+
+@using CRM.Model
+@using CRM.WebHelper
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>getDetils</title>
+    <style type="text/css">
+        .processdiv {
+            border: 1px solid green;
+            padding: 5px;
+            width: 450px;
+        }
+
+        .c40 {
+            color: black;
+        }
+
+        .c41 {
+            color: #ff6a00;
+        }
+
+        .c42 {
+            color: red;
+        }
+
+        .c43 {
+            color: green;
+        }
+
+        .processdiv li {
+            display: inline-block;
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body style="background-color: white;">
+    <div style="width: 500px; margin: 10px auto;">
+        @{    bool isShowbackButton = false;}
+        @if (Model.Any())
+        {
+            var count = Model.Count;
+            var index = 1;
+            var clsname = "c";
+
+
+            foreach (wfProcess process in Model)
+            {
+                isShowbackButton = process.wfWorkNodes.wfnOrderNo == 2 ? false : true;
+                <div class="processdiv">
+                    <ul>
+                        <li><b>处理流程节点:</b>@process.wfWorkNodes.wfNodeTitle</li>
+                        <li><b>处理状态:</b><span class="@clsname@process.wfRFStatus">@process.sysKeyValue.KName</span></li>
+                        <li><b>处理人:</b>@{ var user = UserMgr.GetUserByID(process.wfPExt1);@user.uRealName}</li>
+                        <br />
+                        <li><b>处理理由:</b>@process.wfPDescription</li>
+                    </ul>
+                </div>
+                            if (index < count)
+                            {
+                                <div style="width: 40px; margin: 0 auto;">
+                                    <img src="/Content/admin/ligerUI/skins/icons/down.gif" />
+                                </div>
+                                    }
+                                    index++;
+                                }
+                            }
+
+        <div>
+            <textarea id="reamrk" style="height: 80px; width: 150px"></textarea>
+            <input type="button" value="通过" class="c43" onclick="pass()" />
+            @if (isShowbackButton)
+            {
+                <input type="button" value="驳回上级" class="c41" onclick="back()" />
+
+                <script type="text/javascript">
+                    //驳回上级
+                    function back() {
+                        process("back");
+                    }
+                </script>
+            }
+            <input type="button" value="拒绝" class="c42" onclick="reject()" />
+            <input type="button" value="关闭" onclick="window.parent.helper.win.close()" />
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        //获取当前处理的明细数据主键
+        var wfpid = '@ViewBag.wfpid';
+
+        //通过
+        function pass() {
+            process("pass");
+        }
+
+        //拒绝
+        function reject() {
+            process("reject");
+        }
+
+        function process(processMethod) {
+            var msg = $("#reamrk").val();
+            if (!msg || msg.length <= 0) {
+                helper.warnTip("处理理由必填");
+            }
+
+            $.post("/workflow/wfprocess/" + processMethod + "/" + wfpid, "msg=" + msg, function (ajaxobj) {
+                helper.checkStatus(ajaxobj, function () {
+                    helper.successTip(ajaxobj.msg);
+                    setTimeout(function () {
+                        window.location = window.location;
+                    }, 2000);
+                });
+            }, "json");
+        }
+    </script>
+</body>
+</html>
